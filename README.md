@@ -44,3 +44,11 @@ To evaluate score for all data I average dice loss for every sample to every mod
 | predictions on ax2  | 0.9691  |
 | predictions on ax3  | 0.9629  |
 | avg predictions     | 0.9811  |
+
+Examle masks generated for sample from test dataset:
+
+![](images/prediction_ax1.png)
+
+![](images/prediction_ax2.png)
+
+![](images/prediction_ax3.png)
