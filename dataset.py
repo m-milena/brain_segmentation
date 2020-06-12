@@ -7,6 +7,7 @@ from skimage import transform
 
 
 class Dataset(data.Dataset):
+    ''' Dataset class for brain segmentation '''
     def __init__(self, data_path, transform=None):
         self.data_path = data_path
         self.inputs = [f for f in os.listdir(self.data_path + 'images/') if os.path.isdir(self.data_path + 'inputs/'+f)]
@@ -38,6 +39,7 @@ class Dataset(data.Dataset):
 
 
 class Preprocessing(object):
+    ''' Preprocess medical images '''
     def __init__(self, normalize=True, size=(128,128), toTensor=True):
         self.normalize = normalize
         self.size = size
