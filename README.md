@@ -20,9 +20,9 @@ It is important to tell that data from different axes were placed in different d
 
 ## Network architecture
 
-My approach was to use UNet architecture with pretrained weights. I found repository whose author use this neural network to detect brain tumor so dataset which he used to train was similar (https://github.com/adityajn105/brain-tumor-segmentation-unet). So I can quickly train network to my needs. I also changed encoder input from 3 channels to one.
+My approach was to use UNet architecture with pretrained weights. I found repository whose author use this neural network to made FLAIR abnormality segmentation in brain MRI so dataset which he used to train was similar (https://github.com/mateuszbuda/brain-segmentation-pytorch). So I can quickly train network to my needs. I also changed encoder input from 3 channels to one.
 
-![](https://raw.githubusercontent.com/adityajn105/brain-tumor-segmentation-unet/master/screenshots/unet-tumor-seg.png)
+![](https://raw.githubusercontent.com/mateuszbuda/brain-segmentation-pytorch/master/assets/unet.png)
 
 My approach was to train 3 models - one for every axis. To predict brain mask, I made predictions in every axis for every image, then I built 3d matrix and then I made average value of every value in this matrix. This approach gives better results than training one model in one axis.
 
