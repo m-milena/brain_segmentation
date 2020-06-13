@@ -1,22 +1,26 @@
+import os
+from pathlib import Path
+from typing import Tuple, List
+
+import cv2
 import numpy as np
 import nibabel as nib
-import os
-import cv2
-from typing import Tuple, List
-from pathlib import Path
+
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from PIL import Image
+
 
 max_size = 288
 
-def show_img(img):
+def show_img(img: np.array):
+    ''' Show img using matplotlib pyplot '''
     fig = plt.figure(frameon=False)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
     ax.imshow(img, cmap="gray", origin="lower")
     plt.show()
+
 
 def load_raw_volume(path: Path) -> Tuple[np.ndarray, np.ndarray]:
     data: nib.Nifti1Image = nib.load(str(path))
@@ -30,20 +34,24 @@ def load_raw_volume(path: Path) -> Tuple[np.ndarray, np.ndarray]:
             f.write(str(E) + '\n')
     return raw_data, data.affine
 
-def padd_img(img):
+
+def padd_img(img: np.array) -> np.array:
+    ''' Function for padding smaller imgs to size 288x288'''
     out_size = (288,288)
     out_img = np.zeros(out_size)
     x_pad = int((288-img.shape[0])/2)
     y_pad = int((288-img.shape[1])/2)
-
     out_img[x_pad:x_pad+img.shape[0], y_pad:y_pad+img.shape[1]] = img
-
     return out_img
+
         
-def normalize_data(data):
+def normalize_data(data: np.array) -> np.array:
+    '''Normalize data from 0-255 values'''
     return np.array(255*data/max(data.flatten()), np.uint8)
 
-def save_img(img, path, is_mask = False):
+
+def save_img(img: np.array, path: str, is_mask: bool = False) -> np.array:
+    '''Saving img function'''
     if is_mask:
         img = np.array(img*255, np.uint8)
     img_flipped = np.flip(img, axis=0)

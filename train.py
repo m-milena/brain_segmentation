@@ -10,7 +10,8 @@ import loggs
 from loss import DiceLoss
 from average_meter import AverageMeter
 
-def train_device():
+
+def train_device() -> str:
     ''' Function for using cuda if is available
     returns used device: cuda or cpu
     '''
@@ -22,6 +23,7 @@ def train_device():
 
 
 def main():
+    axis = 'ax1'
     # CUDA for PyTorch
     device = train_device()
 
@@ -30,7 +32,7 @@ def main():
               'shuffle': True,
               'num_workers': 4}
 
-    data_path = './dataset/dataset_ax1/train/'
+    data_path = './dataset/dataset_'+axis+'/train/'
     train_dataset = Dataset(data_path,
                 transform=transforms.Compose([
                                     Preprocessing()]))
@@ -38,7 +40,7 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_dataset, **train_params)
     
     # Validation dataset
-    data_path = './dataset/dataset_ax1/valid/'
+    data_path = './dataset/dataset_'+axis+'/valid/'
     valid_dataset = Dataset(data_path,
                 transform=transforms.Compose([
                                     Preprocessing()]))
@@ -49,12 +51,13 @@ def main():
     
     # Training params
     learning_rate = 1e-4
-    max_epochs = 1000
+    max_epochs = 100
 
     # Used pretrained model and modify channels from 3 to 1
     model = torch.hub.load('mateuszbuda/brain-segmentation-pytorch', 'unet',
     in_channels=3, out_channels=1, init_features=32, pretrained=True)
-    model.encoder1.enc1conv1 = nn.Conv2d(1, 32, kernel_size=(3,3), stride=(1,1), padding= (1,1), bias=False)
+    model.encoder1.enc1conv1 = nn.Conv2d(1, 32, kernel_size=(3,3), 
+                                        stride=(1,1), padding= (1,1), bias=False)
     model.to(device)
     
     # Optimizer and loss function
@@ -83,7 +86,8 @@ def main():
             train_loss.update(loss.item(), image.size(0))
             loss.backward()
             optimizer.step()
-            loggs.training_bar(i, nb_of_batches, prefix='Epoch: %d/%d'%(epoch,max_epochs), suffix='Loss: %.6f'%loss.item())
+            loggs.training_bar(i, nb_of_batches, prefix='Epoch: %d/%d'%(epoch,max_epochs),
+                                 suffix='Loss: %.6f'%loss.item())
         print(train_loss.avg)
         
         with torch.no_grad():
@@ -100,7 +104,7 @@ def main():
             if best_loss > val_loss.avg:
                 print('Updated model with validation loss %.6f ---> %.6f' %(best_loss, val_loss.avg))
                 best_loss = val_loss.avg
-                torch.save(model, './model_ax1/best_model.pt')
+                torch.save(model, './model_'+axis+'/best_model.pt')
            
 
 

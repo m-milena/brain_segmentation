@@ -1,13 +1,8 @@
-import torch
-import torch.nn as nn
-from dataset import Dataset, Preprocessing
-from torchvision import transforms, utils
-import numpy as np
-import cv2
 import os
-import nibabel as nib
-from typing import Tuple, List
 from pathlib import Path
+from typing import Tuple, List
+
+import nibabel as nib
 
 
 def load_raw_volume(path: Path) -> Tuple[np.ndarray, np.ndarray]:
@@ -24,8 +19,8 @@ def load_raw_volume(path: Path) -> Tuple[np.ndarray, np.ndarray]:
     return raw_data, data.affine
 
 def save_labels(data: np.ndarray, affine: np.ndarray, path: Path):
-   ''' Save predictions '''
-  nib.save(nib.Nifti1Image(data, affine), str(path))
+    ''' Save predictions '''
+    nib.save(nib.Nifti1Image(data, affine), str(path))
     
 
 def main():

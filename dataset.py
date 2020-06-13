@@ -1,9 +1,11 @@
 import os
+
 import cv2
-import torch
 import numpy as np
-from torch.utils import data
 from skimage import transform
+
+import torch
+from torch.utils import data
 
 
 class Dataset(data.Dataset):

@@ -1,45 +1,32 @@
+import os
+from pathlib import Path
+from typing import Tuple, List
+
 import torch
 import torch.nn as nn
-from dataset import Dataset, Preprocessing
 from torchvision import transforms, utils
-import numpy as np
+
 import cv2
-import os
+import numpy as np
 import nibabel as nib
-from typing import Tuple, List
-from pathlib import Path
-
-
-def load_raw_volume(path: Path) -> Tuple[np.ndarray, np.ndarray]:
-    ''' Load medical *.nii files '''
-    data: nib.Nifti1Image = nib.load(str(path))
-    data = nib.as_closest_canonical(data)
-    try:
-        raw_data = data.get_fdata(caching='unchanged', dtype=np.float32)
-    except Exception as E:
-        raw_data = None
-        with open('issues.txt', 'a') as f:
-            f.write(str(path) + '\n')
-            f.write(str(E) + '\n')
-    return raw_data, data.affine
+from dataset import Dataset, Preprocessing
+from laad_raw_volume import load_raw_volume
     
     
-def crop(img, size):
+def crop(img: np.array, size: Tuple) -> np.array:
     ''' Crop img to original volume size '''
     x_padding = int((288-size[0])/2)
     y_padding = int((288-size[1])/2)
     new_img = img[x_padding:x_padding+size[0], y_padding:y_padding+size[1]]
-    print(new_img.shape)
-    print(size)
     return new_img
     
 
 def save_labels(data: np.ndarray, affine: np.ndarray, path: Path):
     ''' Save masks '''
-  nib.save(nib.Nifti1Image(data, affine), str(path))
+    nib.save(nib.Nifti1Image(data, affine), str(path))
     
     
-def return_affine(kod):
+def return_affine(kod: str) -> np.array:
     ''' Read affine from originl data '''
     path_1 = './dataset/FirstDataset/test/'
     affine = None
@@ -57,7 +44,7 @@ def return_affine(kod):
                 break
     return affine
     
-def train_device():
+def train_device() -> str:
     ''' Function for using cuda if is available
     returns used device: cuda or cpu
     '''
@@ -84,10 +71,12 @@ def main():
     # Load model
     model = torch.hub.load('mateuszbuda/brain-segmentation-pytorch', 'unet',
     in_channels=3, out_channels=1, init_features=32, pretrained=True)
-    model.encoder1.enc1conv1 = nn.Conv2d(1, 32, kernel_size=(3,3), stride=(1,1), padding= (1,1), bias=False)
-    model = torch.load('./model_ax1_titan/best_model.pt', map_location=device)
+    model.encoder1.enc1conv1 = nn.Conv2d(1, 32, kernel_size=(3,3), stride=(1,1), 
+                                         padding= (1,1), bias=False)
+    model = torch.load('./model_ax1/best_model.pt', map_location=device)
     model.to(device)
     model.eval()
+    
     j = 0
     # Testing
     for sample in samples:
@@ -95,9 +84,10 @@ def main():
             info = f.read()
             info = info.replace(",", "")
             img_shape = list(map(int,(info.split()[-3:])))  
+
         test_dataset = Dataset(sample, is_test=True,
-                transform=transforms.Compose([
-                                    Preprocessing()]))
+                                transform=transforms.Compose([
+                                Preprocessing()]))
         test_loader = torch.utils.data.DataLoader(test_dataset, **test_params)
         result = np.zeros(tuple(img_shape))
         affine = return_affine(kod[j])
@@ -121,6 +111,7 @@ def main():
                 
                 l += 1
                 k += 1
+
         save_labels(result, affine, Path('./predictions2_ax1/'+kod[j]+'.nii.gz'))
         
         j+= 1   

@@ -13,7 +13,7 @@ def load_raw_volume(path: Path) -> Tuple[np.ndarray, np.ndarray]:
     return raw_data, data.affine
 
 
-def maximum_shape():
+def maximum_shape() -> int:
     first_dataset_path = Path('./FirstDataset/train')
     second_dataset_path = Path('./SecondDataset/train')
 
@@ -29,7 +29,6 @@ def maximum_shape():
         max_this_data = max(data.shape)
         max_size = max(max_size, max_this_data)
 
-    print(max_size)
     return max_size
 
 if __name__ == '__main__':
